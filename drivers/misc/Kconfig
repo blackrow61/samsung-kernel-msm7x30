@@ -664,6 +664,11 @@ config GENERIC_BLN
       Say Y here to enable the backlight notification
       for android led-notification (modified liblight needed)
 
+config BCMDHD_WIFI_PM
+	bool "Enable support for changing the WiFi power mode"
+	depends on BCMDHD
+	default y
+
 config PHANTOM_KP_FILTER
 	depends on MACH_ARIESVE
 	bool "Phantom key presses filter"
@@ -687,6 +692,7 @@ config BLX
 	help
 	  Say Y here to enable Battery Life eXtender
 endmenu
+
 
 config BLX
 	bool "Support for Battery Life eXtender"
