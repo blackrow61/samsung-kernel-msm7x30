@@ -51,6 +51,8 @@ int wifi_pm_init(void)
 {
 	int wifi_pm_retval;
 
+	wifi_pm = 0;
+
         wifi_pm_kobj = kobject_create_and_add("wifi_pm", kernel_kobj);
 
         if (!wifi_pm_kobj) {
@@ -62,9 +64,7 @@ int wifi_pm_init(void)
         if (wifi_pm_retval)
 			kobject_put(wifi_pm_kobj);
 	
-	wifi_pm = 0;
-
-        return (wifi_pm_retval);
+	return (wifi_pm_retval);
 }
 
 

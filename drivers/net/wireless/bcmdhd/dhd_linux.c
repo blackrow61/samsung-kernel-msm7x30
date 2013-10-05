@@ -647,10 +647,11 @@ void dhd_enable_packet_filter(int value, dhd_pub_t *dhd)
 #endif /* PKT_FILTER_SUPPORT */
 }
 
-int wifi_pm;
+int wifi_pm = 0;
+
 static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 {
-int power_mode = PM_MAX;
+	int power_mode = PM_MAX;
 	/* wl_pkt_filter_enable_t	enable_parm; */
 	char iovbuf[32];
 #if !defined(CUSTOMER_HW4)
@@ -671,19 +672,22 @@ int power_mode = PM_MAX;
 	DHD_TRACE(("%s: enter, value = %d in_suspend=%d\n",
 		__FUNCTION__, value, dhd->in_suspend));
 
-#ifdef CONFIG_BCMDHD_WIFI_PM
-	if (wifi_pm == 1){
-		power_mode = PM_FAST;
-		DHD_ERROR(("%s: PM_FAST\n", __FUNCTION__));
-	} else
-		DHD_ERROR(("%s: PM_FAST\n", __FUNCTION__));
-#endif
 	dhd_suspend_lock(dhd);
 	if (dhd && dhd->up) {
 		if (value && dhd->in_suspend) {
-#ifdef PKT_FILTER_SUPPORT
-				dhd->early_suspended = 1;
-#endif
+#ifdef CONFIG_BCMDHD_WIFI_PM
+	if (wifi_pm == 1){
+		dhd->early_suspended = 0;
+		/* Kernel is not suspended */
+				DHD_ERROR(("%s: kernel is not suspended!\n", __FUNCTION__));
+
+				power_mode = PM_FAST;
+				dhd_wl_ioctl_cmd(dhd, WLC_SET_PM, (char *)&power_mode,
+				                 sizeof(power_mode), TRUE, 0);
+	} else {
+		dhd->early_suspended = 1;
+	}
+#endif	
 				/* Kernel suspended */
 				DHD_ERROR(("%s: force extra Suspend setting\n", __FUNCTION__));
 
